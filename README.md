@@ -1,1 +1,1 @@
-Application for tracking the trucks carrying bags.
+Logistics tracking app
