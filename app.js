@@ -14,8 +14,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use( '/', routes)
 app.get("/", (req, res) => {
-    res.send('hi');
+    res.send('Logistic_lens');
   });
+
+  // Middleware for error handling
+app.use((err, req, res, next) => {
+  res.status(err.status).json({ success: false, error: err.message });
+  next();
+});
 
 //database connection
  mongoose.connect(process.env.MONGO_URI, 

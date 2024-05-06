@@ -1,6 +1,7 @@
 const Truck = require('../models/trucks.models')
 const mongoose = require('mongoose')
 const TruckDto = require('../dto/truck.dto');
+const APIError = require('../utils/errors');
 
 //Getting trucks
 const getTrucks = async (req, res) => {
@@ -43,24 +44,33 @@ const getTrucksId = async(req, res) => {
         number_plate: truck.number_plate
     });
   }catch (error) {
-        console.error('Error finding truck by ID', error)
+        console.log(error)
         res.status(500).send('Error finding truck by ID')
     }
 }
 
 //Posting Trucks 
-const postTrucks = async (req, res) => {
+const postTrucks = async (req, res, next) => {
     try{
         const data = req.body;
-        const { error } = TruckDto.validate(data);
-        if (error) return res.status(400).json({ error: error.message })
-        const newTruck = new Truck(data)
+        const { error } = TruckDto.validate(data, { abortEarly: false });
+        if (error) throw new APIError(error.message, 400);
+        const newTruck = new Truck(data);
         const savedTruck = await newTruck.save();
         res.status(200).json(savedTruck);
-        console.log('Successfully posted a truck')
+        console.log('Successfully posted a truck', savedTruck);
     }
-    catch(error) {
-        console.error('Error posting trucks');
+    catch (error) {
+        console.log(error);
+        if (error.name === 'MongoError' && error.code === 11000) {
+            // Duplicate key error (number plate already exists)
+            const apiError = new APIError('Number plate already exists', 400);
+            next(apiError);
+        } else if (error instanceof APIError) {
+            next(error);
+        } else {
+            next(new APIError('Server error', 500));
+        }
     }
 }
 
@@ -74,18 +84,18 @@ const deleteTruck = async(req, res) => {
     console.log('Successfully deleted truck', truck);
     res.status(200).send('Truck deleted successfully');
   } catch (error) {
-    console.error('Error deleting truck:', error);
+    console.log(error);
     res.status(401).send('Could not delete truck');
   }
 }
 
 //Edit truck
-const editTruck = async(req, res) => {
+const editTruck = async(req, res, next) => {
    try {
       const { id } = req.params;
       const data = req.body;
-      const { error } = TruckDto.validate(data);
-      if (error) return res.status(400).json({error: message});
+      const { error } = TruckDto.validate(data, { abortEarly: true });
+      if (error) throw new APIError(error.message, 400)
       //find truck, update the request body and return edited document
       const truck = await Truck.findOneAndUpdate( {id}, { $set: { ...data } }, { new: true} );
       //If truck is not found
@@ -96,8 +106,9 @@ const editTruck = async(req, res) => {
       console.log('Successfully edited truck');
       res.status(200).json(truck)
    }catch (error) {
-      console.error('Error editing truck:', error);
-      res.status(401).send('Could not edit truck');
+      console.log(error);
+      if (error instanceof APIError) next(error);
+      next(new APIError('Server error'));
    }
 }
 
