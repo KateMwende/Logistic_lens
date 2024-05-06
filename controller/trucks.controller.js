@@ -94,7 +94,7 @@ const editTruck = async(req, res, next) => {
    try {
       const { id } = req.params;
       const data = req.body;
-      const { error } = TruckDto.validate(data, { abortEarly: true });
+      const { error } = TruckDto.validate(data, { abortEarly:  false } );
       if (error) throw new APIError(error.message, 400)
       //find truck, update the request body and return edited document
       const truck = await Truck.findOneAndUpdate( {id}, { $set: { ...data } }, { new: true} );
