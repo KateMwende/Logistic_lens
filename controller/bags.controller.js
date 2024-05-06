@@ -1,6 +1,7 @@
 const Bag = require('../models/bags.models');
 const BagDto = require('../dto/bag.dto');
-const APIError = require('../utils/errors')
+const APIError = require('../utils/errors');
+const logger = require('../logger');
 
 //Get bags
 const getBags = async(req, res) => {
@@ -22,7 +23,7 @@ const getBags = async(req, res) => {
     }
     res.json(bags);
   } catch (error) {
-    console.error(error);
+    logger.error(error.message);
   }
 }
 
@@ -39,7 +40,7 @@ const getBagsId = async(req, res) => {
         console.log('Bag found:', bag);
         res.json(bag)
     } catch (error) {
-        console.log(error);
+        logger.error(error.message);
     }
 }
 
@@ -54,7 +55,7 @@ const postBags = async(req, res, next) => {
         res.status(200).json(savedBag);
         console.log('Successfully posted a bag', savedBag);
     } catch (error) {
-        console.log(error);
+        logger.error(error.message);
         if (error instanceof APIError) next(error);
         next(new APIError('Server error'));
     }
@@ -69,6 +70,7 @@ const deleteBag = async(req, res) => {
         console.log('Successfully deleted bag:', id);
         res.status(200).send('Truck deleted successfully');
     } catch (error) {
+        logger.error(error.message);
         console.log('Error deleting bag:', error);
         res.status(404).send('Could not delete bag');
     }
@@ -88,7 +90,7 @@ const editBag = async(req, res, next) => {
         res.status(200).json(bag);
         console.log('Successfully edited bag')
     } catch (error) {
-        console.log(error) 
+        logger.error(error.message);
         if (error instanceof APIError) next(error);
         next(new APIError('Server error'));
     }

@@ -2,6 +2,7 @@ const Truck = require('../models/trucks.models')
 const mongoose = require('mongoose')
 const TruckDto = require('../dto/truck.dto');
 const APIError = require('../utils/errors');
+const logger = require('../logger');
 
 //Getting trucks
 const getTrucks = async (req, res) => {
@@ -21,7 +22,7 @@ const getTrucks = async (req, res) => {
         res.json(trucks);
     }
     catch (error) {
-        console.error(error);
+        logger.error(error.message);
     }
 };
 
@@ -44,7 +45,7 @@ const getTrucksId = async(req, res) => {
         number_plate: truck.number_plate
     });
   }catch (error) {
-        console.log(error)
+        logger.error(error.message);
         res.status(500).send('Error finding truck by ID')
     }
 }
@@ -61,7 +62,7 @@ const postTrucks = async (req, res, next) => {
         console.log('Successfully posted a truck', savedTruck);
     }
     catch (error) {
-        console.log(error);
+        logger.error(error.message);
         if (error.name === 'MongoError' && error.code === 11000) {
             // Duplicate key error (number plate already exists)
             const apiError = new APIError('Number plate already exists', 400);
@@ -84,7 +85,7 @@ const deleteTruck = async(req, res) => {
     console.log('Successfully deleted truck', truck);
     res.status(200).send('Truck deleted successfully');
   } catch (error) {
-    console.log(error);
+    logger.error(error.message);
     res.status(401).send('Could not delete truck');
   }
 }
@@ -106,7 +107,7 @@ const editTruck = async(req, res, next) => {
       console.log('Successfully edited truck');
       res.status(200).json(truck)
    }catch (error) {
-      console.log(error);
+      logger.error(error.message);
       if (error instanceof APIError) next(error);
       next(new APIError('Server error'));
    }

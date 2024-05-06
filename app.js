@@ -2,6 +2,7 @@ const express = require('express');
 require('dotenv').config();
 const mongoose = require('mongoose');
 
+
 //create instance of express
 const app = express();
 
@@ -17,10 +18,11 @@ app.get("/", (req, res) => {
     res.send('Logistic_lens');
   });
 
-  // Middleware for error handling
+
+// Middleware for error handling
 app.use((err, req, res, next) => {
+  
   res.status(err.status).json({ success: false, error: err.message });
-  next();
 });
 
 //database connection
