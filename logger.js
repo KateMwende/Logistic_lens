@@ -8,11 +8,11 @@ const logger = winston.createLogger({
       timestamp(),
       json(),
       prettyPrint(),
-      errors({ stack: true })
+      errors({stack: true})
     ),
     transports: [
       new winston.transports.Console(),
-      new winston.transports.File({filename: 'logs.js', level: 'error'})
+      new winston.transports.File({filename: 'logs.log', level: 'error'})
     ]
   })
 
