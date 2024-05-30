@@ -1,5 +1,5 @@
 {
-    "name": "agric_app",
+    "name": "logistic_lens",
     "version": "1.0.0",
     "description": "",
     "main": "app.js",
@@ -12,6 +12,7 @@
         "dotenv": "^16.3.1",
         "express": "^4.17.1",
         "joi": "^17.13.0",
+        "jsonwebtoken": "^9.0.2",
         "mongoose": "^5.9.23",
         "nodemon": "^3.1.0",
         "uuid": "^9.0.1",

@@ -21,7 +21,6 @@ app.get("/", (req, res) => {
 
 // Middleware for error handling
 app.use((err, req, res, next) => {
-  
   res.status(err.status).json({ success: false, error: err.message });
 });
 
