@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const APIError = require('../utils/errors');
 
 //define user schema
 const userSchema = new mongoose.Schema({
@@ -24,16 +25,16 @@ userSchema.pre('save', async function(next) {
 })
 
 //Method to log in a user
-userSchema.statics.login = async (email, password) => {
+userSchema.statics.login = async function (email, password) {
     const user = await this.findOne({ email });
     if (user) {
       const auth = await  bcrypt.compare(password, user.password);
       if (auth) {
         return user;
       }
-      throw Error('Incorrect password');
+      throw new APIError('Incorrect password', 401);
     }
-    throw Error('Incorrect email');
+    throw new APIError('Incorrect email', 401);
 }
 
 const User = mongoose.model('user', userSchema);

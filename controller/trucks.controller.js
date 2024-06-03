@@ -19,7 +19,7 @@ const getTrucks = async (req, res, next) => {
         if (trucks.length === 0) {
             throw new APIError('No truck found', 404);
         }
-        res.json(trucks);
+        res.status(200).json(trucks);
     }
     catch (error) {
         logger.error(error.stack);
@@ -40,7 +40,8 @@ const getTrucksId = async(req, res, next) => {
         throw new APIError('No truck found', 404)
         return;
     }
-    res.json({truck});
+    console.log('Truck found:', truck);
+    res.status(200).json({truck});
   }catch (error) {
         logger.error(error.stack); 
         let thrownError = error;
@@ -58,8 +59,8 @@ const postTrucks = async (req, res, next) => {
         if (error) throw new APIError(error.message, 400);
         const newTruck = new Truck(data);
         const savedTruck = await newTruck.save();
-        res.status(200).json(savedTruck);
         console.log('Successfully posted a truck', savedTruck);
+        res.status(200).json({ success: 'Successfully posted a truck', savedTruck });
     }
     catch (error) {
         logger.error(error.stack);
@@ -76,14 +77,17 @@ const postTrucks = async (req, res, next) => {
 }
 
 //Delete a truck
-const deleteTruck = async(req, res) => {
+const deleteTruck = async(req, res, next) => {
   try {
     const id = req.params.id;
     // Find and delete the truck
     const truck = await Truck.findOneAndDelete({ id: id});
+    if (!truck) {
+        throw new APIError('Could not find truck', 404);
+    }
     //Success of deletion
     console.log('Successfully deleted truck', truck);
-    res.status(200).send('Successfuly deleted truck');
+    res.status(200).json({ success: 'Successfully deleted truck', truck });
   } catch (error) {
     logger.error(error.message);
     let thrownError = error;
@@ -107,8 +111,8 @@ const editTruck = async(req, res, next) => {
         throw new APIError('Could not find truck', 404);
       }
       //Successful editing
-      res.status(200).json(truck);
-      console.log('Successfully edited truck');
+      console.log('Successfully edited truck', truck);
+      res.status(200).json({ message: 'Successfully edited truck', truck });
    }catch (error) {
       logger.error(error.message);
       if (!(error instanceof APIError)) 

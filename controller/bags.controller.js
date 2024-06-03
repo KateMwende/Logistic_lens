@@ -24,7 +24,7 @@ const getBags = async (req, res, next) => {
         if (bags.length === 0) {
             throw new APIError('No bags found', 404);
         }
-        res.json(bags);
+        res.status(200).json(bags);
     } catch (error) {
         logger.error(error.stack);
         let thrownError = error;
@@ -44,7 +44,7 @@ const getBagsId = async (req, res, next) => {
             return;
         }
         console.log('Bag found:', bag);
-        res.json(bag)
+        res.status(200).json({bag});
     } catch (error) {
         logger.error(error.stack);
         let thrownError = error;
@@ -62,8 +62,8 @@ const postBags = async (req, res, next) => {
         if (error) throw new APIError(error.message, 400, error.stack);
         const newBag = new Bag(data);
         const savedBag = await newBag.save();
-        res.status(200).json(savedBag);
         console.log('Successfully posted a bag', savedBag);
+        res.status(200).json({ success: 'Successfully posted a bag', savedBag });
     } catch (error) {
         logger.error(error.stack);
         let thrownError = error;
@@ -83,7 +83,7 @@ const deleteBag = async (req, res, next) => {
         }
         //Deletion success
         console.log('Successfully deleted bag:', bag);
-        res.status(200).send('Bag deleted successfully');
+        res.status(200).json({ success: 'Successfully deleted bag', bag });
     } catch (error) {
         logger.error(error.stack);
         let thrownError = error;
@@ -104,8 +104,8 @@ const editBag = async (req, res, next) => {
         if (!bag) {
             throw new APIError('Could not find bag', 404);
         }
-        res.status(200).json(bag);
-        console.log('Successfully edited bag');
+        console.log('Successfully edited bag', bag);
+        res.status(200).json({ message: 'Successfully deleted bag', bag });
     } catch (error) {
         logger.error(error.stack);
         let thrownError = error;

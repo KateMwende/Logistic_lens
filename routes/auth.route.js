@@ -7,4 +7,7 @@ router.get('/signup', authController.getSignup);
 //Post signup details
 router.post('/register', authController.createUser);
 
+//Login a user
+router.post('/login', authController.loginUser);
+
 module.exports = router;
