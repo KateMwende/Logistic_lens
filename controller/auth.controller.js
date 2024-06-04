@@ -6,8 +6,8 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const maxAge = 3 * 24 * 60 * 60;
-const createToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
+const createToken = (user) => {
+    return jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {
         expiresIn: maxAge
     })
 }
@@ -17,13 +17,13 @@ const getSignup = (req, res) => {
 }
 
 const createUser = async (req, res, next) => {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
     try {
       //Validate the data
        const { error } = UserDto.validate(req.body, { abortEarly:  false } );
        if (error) throw new APIError(error.message, 400)
       //Create the new user
-       const newUser = new User({email, password});
+       const newUser = new User({email, password, role});
        //Save User to DB
        const savedUser = await newUser.save();
       //Successful creation 
@@ -44,7 +44,7 @@ const loginUser = async(req, res, next) => {
     const { email, password } = req.body;
     try {
         const user = await User.login(email, password);
-        const token = createToken(user._id);
+        const token = createToken(user);
         console.log('Successfully logged in', user);
         res.status(200).json({ user, token });
     } catch (error) {
@@ -56,4 +56,18 @@ const loginUser = async(req, res, next) => {
     }
 }
 
-module.exports = { createUser, getSignup, loginUser};
+// Logout a user
+const logoutUser = (req, res) => {
+    res.status(200).json({ success: 'Successfully logged out' });
+};
+
+const listUsers = async (req, res, next) => {
+    try {
+        const users = await User.find({}, '-password'); // Exclude password field
+        res.status(200).json(users);
+    } catch (error) {
+        next(new APIError('Failed to retrieve users', 500));
+    }
+};
+
+module.exports = { createUser, getSignup, loginUser, logoutUser, listUsers};

@@ -14,7 +14,7 @@ const authMiddleware = (req, res, next) => {
         if (err) {
           return next(new APIError('Token is not valid', 401));
         }
-        console.log(decodedToken);
+        req.user = decodedToken;
        next();
     });
 };

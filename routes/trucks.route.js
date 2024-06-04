@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const truckController = require('../controller/trucks.controller');
 const authMiddleware = require('../middleware/authMiddleware');
+const roleMiddleware = require('../middleware/roleMiddleware');
 
 //Get all trucks
 router.get('/trucks', truckController.getTrucks);
@@ -9,12 +10,12 @@ router.get('/trucks', truckController.getTrucks);
 router.get('/trucks/:id', truckController.getTrucksId)
 
 //Post trucks
-router.post('/trucks', authMiddleware, truckController.postTrucks);
+router.post('/trucks', authMiddleware, roleMiddleware('admin', 'superAdmin'), truckController.postTrucks);
 
 //Delete a truck by id
-router.delete('/trucks/:id', authMiddleware, truckController.deleteTruck);
+router.delete('/trucks/:id', authMiddleware, roleMiddleware('admin', 'superAdmin'), truckController.deleteTruck);
 
 //Edit a truck by id
-router.put('/trucks/:id', authMiddleware, truckController.editTruck);
+router.put('/trucks/:id', authMiddleware, roleMiddleware('admin', 'superAdmin'), truckController.editTruck);
 
 module.exports = router;
