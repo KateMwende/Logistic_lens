@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const truckController = require('../controller/trucks.controller');
-const authMiddleware = require('../middleware/authMiddleware');
-const roleMiddleware = require('../middleware/roleMiddleware');
+const authMiddleware = require('../middleware/auth.middleware');
+const roleMiddleware = require('../middleware/role.middleware');
 
 //Get all trucks
 router.get('/trucks', truckController.getTrucks);

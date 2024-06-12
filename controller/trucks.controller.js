@@ -6,7 +6,7 @@ const logger = require('../logger');
 
 //Getting trucks
 const getTrucks = async (req, res, next) => {
-    const { driver, number_plate } = req.query;
+    const { driver, number_plate, destination } = req.query;
     const query = {};
     if (driver) {
         query.driver = driver
@@ -14,12 +14,15 @@ const getTrucks = async (req, res, next) => {
     if (number_plate) {
         query.number_plate = number_plate;
     }
+    if (destination) {
+        query.destination = destination;
+    }
     try{
         const trucks = await Truck.find(query);
         if (trucks.length === 0) {
             throw new APIError('No truck found', 404);
         }
-        res.status(200).json(trucks);
+        res.status(200).json({"trucks": trucks});
     }
     catch (error) {
         logger.error(error.stack);
@@ -35,7 +38,7 @@ const getTrucksId = async(req, res, next) => {
   try { 
     const id = req.params.id;
     //find by id
-    const truck = await Truck.findOne({ id: id });
+    const truck = await Truck.findById(id);
     if (!truck) {
         throw new APIError('No truck found', 404)
         return;
@@ -81,7 +84,7 @@ const deleteTruck = async(req, res, next) => {
   try {
     const id = req.params.id;
     // Find and delete the truck
-    const truck = await Truck.findOneAndDelete({ id: id});
+    const truck = await Truck.findOneAndDelete(id);
     if (!truck) {
         throw new APIError('Could not find truck', 404);
     }
@@ -100,12 +103,13 @@ const deleteTruck = async(req, res, next) => {
 //Edit truck
 const editTruck = async(req, res, next) => {
    try {
-      const { id } = req.params;
+      const id = req.params.id;
       const data = req.body;
       const { error } = TruckDto.validate(data, { abortEarly:  false } );
       if (error) throw new APIError(error.message, 400)
       //find truck, update the request body and return edited document
-      const truck = await Truck.findOneAndUpdate( {id}, { $set: { ...data } }, { new: true} );
+      const truck = await Truck.findOneAndUpdate( { _id: id }, { $set: { ...data } }, { new: true} );
+      console.log(truck);
       //If truck is not found
       if (!truck) {
         throw new APIError('Could not find truck', 404);
@@ -115,6 +119,7 @@ const editTruck = async(req, res, next) => {
       res.status(200).json({ message: 'Successfully edited truck', truck });
    }catch (error) {
       logger.error(error.message);
+      let thrownError = error;
       if (!(error instanceof APIError)) 
         next(new Error('Internal server error'));
       next(thrownError);

@@ -26,6 +26,8 @@ const createUser = async (req, res, next) => {
        const newUser = new User({email, password, role});
        //Save User to DB
        const savedUser = await newUser.save();
+       //Send email
+       
       //Successful creation 
        console.log('Successfully created user', savedUser);
        res.status(200).json({ message: 'Successfully created user', savedUser});

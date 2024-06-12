@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const bagsController = require('../controller/bags.controller');
-const authMiddleware = require('../middleware/authMiddleware');
-const roleMiddleware = require('../middleware/roleMiddleware');
+const authMiddleware = require('../middleware/auth.middleware');
+const roleMiddleware = require('../middleware/role.middleware');
 
 //Get all bags
 router.get('/bags', bagsController.getBags);

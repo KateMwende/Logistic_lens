@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const authController = require('../controller/auth.controller');
-const authMiddleware = require('../middleware/authMiddleware');
-const roleMiddleware = require('../middleware/roleMiddleware');
+const authMiddleware = require('../middleware/auth.middleware');
+const roleMiddleware = require('../middleware/role.middleware');
 
 //Get signup page
 router.get('/signup', authController.getSignup);

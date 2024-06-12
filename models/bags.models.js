@@ -5,9 +5,9 @@ const Truck = require('./trucks.models');
 //define a bags schema
 const bagSchema = new mongoose.Schema({
     description: { type: String, required: true },
-    id: { type: String, default: uuidv4 },
+    _id: { type: String, default: uuidv4 },
     weight: Number,
-    units: { type: String, enum: ['kgs', 'ton'], require: true },
+    units: { type: String, enum: ['kgs', 'ton'], required: true },
     truck_id: { type: mongoose.Schema.Types.String, ref: 'Truck',  required: true } // Link to truck
 });
 
