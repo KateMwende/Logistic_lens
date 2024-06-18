@@ -13,19 +13,6 @@ const truckSchema = new mongoose.Schema({
     bags: [bagSchema] // List of bags in the truck
 });
 
-//Delete all the bags associated with the truck before deleting truck
-truckSchema.pre('findOneAndDelete', async function(next) {
-    try {
-        const truck = await this.model.findOne(this.getQuery());
-        if (truck) {
-            await Bag.deleteMany({_id: { $in: truck.bags } })
-        }
-        next();
-    } catch (err) {
-        next(err);
-    }
-});
-
 const Truck = mongoose.model('truck', truckSchema)
 
 module.exports = Truck;

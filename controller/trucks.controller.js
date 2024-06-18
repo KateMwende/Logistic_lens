@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const TruckDto = require('../dto/truck.dto');
 const APIError = require('../utils/errors');
 const logger = require('../logger');
-
+const { Bag } = require('../models/bags.models');
 //Getting trucks
 const getTrucks = async (req, res, next) => {
     const { driver, number_plate, destination } = req.query;
@@ -81,13 +81,24 @@ const postTrucks = async (req, res, next) => {
 
 //Delete a truck
 const deleteTruck = async(req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
     const id = req.params.id;
-    // Find and delete the truck
-    const truck = await Truck.findOneAndDelete(id);
+    // Find the truck
+    const truck = await Truck.findOne({_id: id}).session(session);
     if (!truck) {
         throw new APIError('Could not find truck', 404);
     }
+    // Delete all bags associated with the truck
+    await Bag.deleteMany({ truck_id: id }).session(session);
+
+    // Delete the truck
+    await Truck.findOneAndDelete({ _id: id }).session(session);
+
+    // Commit the transaction
+    await session.commitTransaction();
+    session.endSession();
     //Success of deletion
     console.log('Successfully deleted truck', truck);
     res.status(200).json({ success: 'Successfully deleted truck', truck });
