@@ -7,7 +7,7 @@ const roleMiddleware = require('../middleware/role.middleware');
 router.get('/signup', authController.getSignup);
 
 //Post signup details
-router.post('/register', authController.createUser);
+router.post('/register', authMiddleware, roleMiddleware('superAdmin'), authController.createUser);
 
 //Login a user
 router.post('/login', authController.loginUser);
