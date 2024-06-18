@@ -1,5 +1,4 @@
 const APIError = require('../utils/errors');
-const user = require('../models/user.models');
 
 const roleMiddleware = (...requiredRole) => {
     return (req, res, next) => {

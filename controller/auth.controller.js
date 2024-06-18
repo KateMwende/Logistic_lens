@@ -72,4 +72,20 @@ const listUsers = async (req, res, next) => {
     }
 };
 
-module.exports = { createUser, getSignup, loginUser, logoutUser, listUsers};
+const deleteUsers = async (req, res, next) =>{
+    try{
+        const userId = req.params.id;
+        const user = await User.findByIdAndDelete(userId);
+        if (!user) {
+            throw new APIError('Could not find user', 404);
+        };
+        res.status(200).json({ success: 'User deleted successfully', user });
+    } catch (error) {
+        logger.error(error.stack);
+        let thrownError = error;
+        if (!(error instanceof APIError))
+            thrownError = new Error('Internal Server error');
+        next(thrownError);
+    }
+}
+module.exports = { createUser, getSignup, loginUser, logoutUser, listUsers, deleteUsers };
